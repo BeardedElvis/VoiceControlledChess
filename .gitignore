@@ -7,4 +7,14 @@ env36/Scripts/
 
 env36/
 
+envChess/
+
 .vs/
+
+data/
+
+*.aup
+
+*.au
+
+*.whl
