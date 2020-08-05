@@ -1,15 +1,23 @@
 # sound file reading + spectrogram
+print("Importing os")
 import os
+print("Importing librosa")
 import librosa
+print("Importing librosa.display")
 import librosa.display
+print("Importing pyplot")
 import matplotlib.pyplot as plt
 
 # sound recording
+print("Importing sounddevice")
 import sounddevice as sd
 
 # machine learning
+print("Importing tensorflow")
 import tensorflow as tf
+print("Importing keras")
 from tensorflow import keras
+print("Importing numpy")
 import numpy as np
 
 audio_fpath = "./input/audio/audio/"
