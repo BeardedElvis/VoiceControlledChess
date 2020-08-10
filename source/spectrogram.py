@@ -23,14 +23,15 @@ import numpy as np
 print("Importing random")
 import random
 
-audio_fpath = "./input/audio/audio/"
+# Load training set
+audio_fpath = "./input/audio/train/"
 audio_clips = os.listdir(audio_fpath)
 print("No. of .wav files in audio folder: ", len(audio_clips))
 
-specs = np.empty((len(audio_clips), 1025, 64))
+train_specs = np.empty((len(audio_clips), 1025, 64))
 labels = np.empty(len(audio_clips), dtype=int)
 
-print(specs.shape)
+print("Train specs: ",train_specs.shape)
 number = 0
 for fileName in audio_clips:
     labels[number] = ord(fileName[0]) - 65
@@ -39,7 +40,29 @@ for fileName in audio_clips:
     X = librosa.stft(x)
     Xdb = librosa.amplitude_to_db(abs(X))
 
-    specs[number] = Xdb
+    train_specs[number] = Xdb
+    number += 1
+
+#______________________________________________________________________________
+
+# Load testing set
+audio_fpath = "./input/audio/test/"
+audio_clips = os.listdir(audio_fpath)
+print("No. of .wav files in audio folder: ", len(audio_clips))
+
+test_specs = np.empty((len(audio_clips), 1025, 64))
+test_labels = np.empty(len(audio_clips), dtype=int)
+
+print("Test specs: ", test_specs.shape)
+number = 0
+for fileName in audio_clips:
+    test_labels[number] = ord(fileName[0]) - 65
+    x, sr = librosa.load(audio_fpath+fileName, sr=44100, mono=True)
+
+    X = librosa.stft(x)
+    Xdb = librosa.amplitude_to_db(abs(X))
+
+    test_specs[number] = Xdb
     number += 1
 
 ## To display
@@ -52,12 +75,12 @@ for fileName in audio_clips:
 # librosa.display.waveplot(x, sr=sr)
 
 # plt.figure(figsize=(14, 5))
-# librosa.display.specshow(specs[0], sr=sr, x_axis='time', y_axis='log')
+# librosa.display.specshow(train_specs[0], sr=sr, x_axis='time', y_axis='log')
 # plt.colorbar()
 # plt.show()
 
 # plt.figure()
-# plt.imshow(specs[0])
+# plt.imshow(train_specs[0])
 # plt.colorbar()
 # plt.grid(False)
 # plt.show()
@@ -66,8 +89,8 @@ for fileName in audio_clips:
 # for fileName in audio_clips:
 #     plt.figure(figsize=(7, 5))
 #     plt.title(fileName)
-#     # librosa.display.specshow(specs[number], sr=sr, x_axis='time', y_axis='log')
-#     plt.imshow(specs[number])
+#     # librosa.display.specshow(train_specs[number], sr=sr, x_axis='time', y_axis='log')
+#     plt.imshow(train_specs[number])
 #     plt.colorbar()
 #     plt.show()
 #     number += 1
@@ -75,7 +98,7 @@ for fileName in audio_clips:
 #__________________________________________________________________________
 
 # Normalise
-for spec in specs:
+for spec in train_specs:
     smallest = 50
     largest = -63
     for nums in spec:
@@ -97,8 +120,8 @@ for spec in specs:
 #     plt.xticks([])
 #     plt.yticks([])
 #     plt.grid(False)
-#     librosa.display.specshow(specs[i], sr=sr, x_axis='time', y_axis='log')
-#     # plt.imshow(specs[i], cmap=plt.cm.binary)
+#     librosa.display.specshow(train_specs[i], sr=sr, x_axis='time', y_axis='log')
+#     # plt.imshow(train_specs[i], cmap=plt.cm.binary)
 #     plt.xlabel(labels[i])
 # plt.show()
 
@@ -116,14 +139,12 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 # Fit model
-model.fit(specs, labels, epochs=10)
+model.fit(train_specs, labels, epochs=50)
+
+print("\n")
 
 # Test model
-test_specs = specs      # Change
-test_labels = labels    # Change
 test_loss, test_acc = model.evaluate(test_specs, test_labels, verbose=2)
-
-print("\nTest accuracy: ", test_acc)
 
 probability_model = tf.keras.Sequential([model,
                                         tf.keras.layers.Softmax()])
