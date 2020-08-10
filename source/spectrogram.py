@@ -138,8 +138,13 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
+# model.summary()
+
 # Fit model
-model.fit(train_specs, labels, epochs=50)
+model.fit(train_specs, labels, epochs=10)
+
+# Save model
+model.save('./models/my_model') 
 
 print("\n")
 
@@ -149,7 +154,7 @@ test_loss, test_acc = model.evaluate(test_specs, test_labels, verbose=2)
 probability_model = tf.keras.Sequential([model,
                                         tf.keras.layers.Softmax()])
 
-predictions = probability_model.predict(test_specs)
+# predictions = probability_model.predict(test_specs)
 
 # for i in range(len(test_specs)):
 #     print("\nPredicted: ",np.argmax(predictions[i]))
