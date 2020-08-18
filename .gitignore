@@ -9,6 +9,10 @@ env36/
 
 envChess/
 
+input/
+
+models/
+
 .vs/
 
 data/
@@ -18,3 +22,5 @@ data/
 *.au
 
 *.whl
+
+*.rar
