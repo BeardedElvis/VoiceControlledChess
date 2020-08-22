@@ -23,6 +23,8 @@ print("Importing keras")
 from tensorflow import keras
 print("Importing numpy")
 import numpy as np
+print("Importing soundfile")
+import soundfile as sf
 
 """ TEMPORARY """
 #_______________________________________________________________________
@@ -895,21 +897,21 @@ while running:
             elif c == 'row':
                 # Record voice
                 seconds = 2
-                print('\nRecording label ', record_label, ' index ', record_index)
+                print('\nRecording label', record_label, 'index', record_index)
                 x = sd.rec(int(seconds * sr), samplerate=sr, channels=1)
                 sd.wait()
 
                 # Transform recording to spectrogram
                 x = np.reshape(x, x.size)
                 
-                librosa.output.write_wav("./input/audio/recordedNumbers/" + str(record_label) + " - " + str(record_index) + ".wav", x, sr)
+                sf.write("./input/audio/recordedNumbers/" + str(record_label) + " - " + str(record_index) + ".wav", x, sr, subtype='PCM_24')
                 print('Recording finished')
 
                 record_index = record_index + 1
-                if record_index == 250:
+                if record_index == 1:
                     record_index = 0
                     record_label = record_label + 1
-                    print('\nNext up: ', record_label)
+                    print('\nNext up:', record_label)
                 
 
                 """ TO USE """
