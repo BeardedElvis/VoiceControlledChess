@@ -60,7 +60,9 @@ for fileName in audio_clips:
 
 spec_length = 190
 for i in range(len(test_specs_list)):
-    test_specs_list[i] = np.pad(test_specs_list[i], ((0,0),(0, spec_length - test_specs_list[i].shape[1])), 'constant')
+    pad_length_before = int((spec_length - test_specs_list[i].shape[1]) / 2)
+    pad_length_after = spec_length - test_specs_list[i].shape[1] - pad_length_before
+    test_specs_list[i] = np.pad(test_specs_list[i], ((0,0),(pad_length_before, pad_length_after)), 'constant')
 
 test_specs = np.array(test_specs_list)
 
@@ -77,9 +79,17 @@ model.evaluate(test_specs, test_labels, verbose=2)
 # Use trained model
 
 chosen_spec = random.randint(0, len(test_labels) - 1)
-print("Testing spec nr ", chosen_spec)
+print("Testing spec nr ", chosen_spec,"\nLabel ", audio_clips[chosen_spec][0])
 
 spec = test_specs[chosen_spec]
+
+plt.figure(figsize=(20,5))
+
+plt.subplot(2,2,1)
+plt.xticks([])
+plt.yticks([])
+plt.grid(False)
+librosa.display.specshow(spec, sr=sr, x_axis='time', y_axis='log')
 
 spec = (np.expand_dims(spec,0))
 
@@ -88,3 +98,38 @@ predictions_single = model.predict(spec)
 print("\nPredicted: ",np.argmax(predictions_single[0]))
 
 print("Actual: ", test_labels[chosen_spec])
+
+# To record:
+#____________________________________________________________________
+seconds = 30
+print('Start talking')
+x = sd.rec(int(seconds * sr), samplerate=sr, channels=1)
+sd.wait()
+
+x = np.reshape(x, x.size)
+
+librosa.output.write_wav("./input/audio/noise.wav", x, sr)
+
+# X = librosa.stft(x)
+# Xdb = librosa.amplitude_to_db(abs(X))
+
+# pad_length_before = int((spec_length - Xdb.shape[1]) / 2)
+# pad_length_after = spec_length - Xdb.shape[1] - pad_length_before
+# Xdb = np.pad(Xdb, ((0,0),(pad_length_before, pad_length_after)), 'constant')
+
+# Xdb = Xdb - np.amin(Xdb)
+# Xdb = Xdb / (np.amax(Xdb) - np.amin(Xdb))
+
+# plt.subplot(2, 2, 2)
+# librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='log')
+
+# Xdb = (np.expand_dims(Xdb,0))
+
+# predict_recording = model.predict(Xdb)
+
+# print("nPredicted: ",np.argmax(predict_recording[0]))
+
+# plt.colorbar()
+
+# plt.show()
+#____________________________________________________________________

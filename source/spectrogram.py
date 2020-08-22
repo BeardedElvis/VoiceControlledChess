@@ -77,12 +77,16 @@ for fileName in audio_clips:
     number += 1
 
 for i in range(len(train_specs_list)):
-    train_specs_list[i] = np.pad(train_specs_list[i], ((0,0),(0, spec_length - train_specs_list[i].shape[1])), 'constant')
+    pad_length_before = int((spec_length - train_specs_list[i].shape[1]) / 2)
+    pad_length_after = spec_length - train_specs_list[i].shape[1] - pad_length_before
+    train_specs_list[i] = np.pad(train_specs_list[i], ((0,0),(pad_length_before, pad_length_after)), 'constant')
 
 train_specs = np.array(train_specs_list)
 
 for i in range(len(test_specs_list)):
-    test_specs_list[i] = np.pad(test_specs_list[i], ((0,0),(0, spec_length - test_specs_list[i].shape[1])), 'constant')
+    pad_length_before = int((spec_length - test_specs_list[i].shape[1]) / 2)
+    pad_length_after = spec_length - test_specs_list[i].shape[1] - pad_length_before
+    test_specs_list[i] = np.pad(test_specs_list[i], ((0,0),(pad_length_before, pad_length_after)), 'constant')
 
 test_specs = np.array(test_specs_list)
 
