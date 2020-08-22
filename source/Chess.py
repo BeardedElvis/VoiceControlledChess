@@ -642,8 +642,10 @@ noise, sr = librosa.load("./input/audio/noise.wav", sr=44100, mono=True)
 noise = librosa.stft(noise)
 noise = librosa.amplitude_to_db(abs(noise))
 
-record_label = 1
-record_index = 0
+record_label_number = 1
+record_index_number = 0
+record_label_letter = 65
+record_index_letter = 0
 
 """ Image Loading """
 king1 = image.load(os.path.join(image_path, "wking.png")).convert_alpha()
@@ -849,27 +851,47 @@ while running:
             elif c == 'quit':   # Exit game button
                 running = 0
             elif c == 'column':
+                # Record voice
+                seconds = 2
+                print('\nRecording label', chr(record_label_letter), 'index', record_index_letter)
+                x = sd.rec(int(seconds * sr), samplerate=sr, channels=1)
+                sd.wait()
+
+                # Transform recording to spectrogram
+                x = np.reshape(x, x.size)
+                
+                sf.write("./input/audio/recordedLetters/" + chr(record_label_letter) + " - " + str(record_index_letter) + ".wav", x, sr, subtype='PCM_24')
+                print('Recording finished')
+
+                record_index_letter = record_index_letter + 1
+                if record_index_letter == 250:
+                    record_index_letter = 0
+                    record_label_letter = record_label_letter + 1
+                    print('\nNext up:', record_label_letter)
+
+
+
                 """ TEMPORARY """
-                #___________________________________________________________________________
+                # #___________________________________________________________________________
 
-                chosen_spec = random.randint(0, len(test_labels) - 1)
-                print("\nTesting spec nr ", chosen_spec,"\nLabel ", audio_clips[chosen_spec][0])
+                # chosen_spec = random.randint(0, len(test_labels) - 1)
+                # print("\nTesting spec nr ", chosen_spec,"\nLabel ", audio_clips[chosen_spec][0])
 
-                spec = test_specs[chosen_spec]
+                # spec = test_specs[chosen_spec]
 
-                plt.subplot(2,2,1)
-                plt.xticks([])
-                plt.yticks([])
-                plt.grid(False)
-                librosa.display.specshow(spec, sr=sr, x_axis='time', y_axis='log')
+                # plt.subplot(2,2,1)
+                # plt.xticks([])
+                # plt.yticks([])
+                # plt.grid(False)
+                # librosa.display.specshow(spec, sr=sr, x_axis='time', y_axis='log')
 
-                spec = (np.expand_dims(spec,0))
+                # spec = (np.expand_dims(spec,0))
 
-                predictions_single = model.predict(spec)
+                # predictions_single = model.predict(spec)
 
-                print("\nPredicted: ",np.argmax(predictions_single[0]))
+                # print("\nPredicted: ",np.argmax(predictions_single[0]))
 
-                print("Actual: ", test_labels[chosen_spec])
+                # print("Actual: ", test_labels[chosen_spec])
 
                 #___________________________________________________________________________
 
@@ -897,21 +919,21 @@ while running:
             elif c == 'row':
                 # Record voice
                 seconds = 2
-                print('\nRecording label', record_label, 'index', record_index)
+                print('\nRecording label', record_label_number, 'index', record_index_number)
                 x = sd.rec(int(seconds * sr), samplerate=sr, channels=1)
                 sd.wait()
 
                 # Transform recording to spectrogram
                 x = np.reshape(x, x.size)
                 
-                sf.write("./input/audio/recordedNumbers/" + str(record_label) + " - " + str(record_index) + ".wav", x, sr, subtype='PCM_24')
+                sf.write("./input/audio/recordedNumbers/" + str(record_label_number) + " - " + str(record_index_number) + ".wav", x, sr, subtype='PCM_24')
                 print('Recording finished')
 
-                record_index = record_index + 1
-                if record_index == 1:
-                    record_index = 0
-                    record_label = record_label + 1
-                    print('\nNext up:', record_label)
+                record_index_number = record_index_number + 1
+                if record_index_number == 250:
+                    record_index_number = 0
+                    record_label_number = record_label_number + 1
+                    print('\nNext up:', record_label_number)
                 
 
                 """ TO USE """
