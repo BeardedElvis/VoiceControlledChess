@@ -26,50 +26,6 @@ import numpy as np
 print("Importing soundfile")
 import soundfile as sf
 
-""" TEMPORARY """
-#_______________________________________________________________________
-
-print("Importing random")
-import random
-
-# Load testing set
-audio_fpath = "./input/audio/testNumbers/"
-audio_clips = os.listdir(audio_fpath)
-print("No. of .wav files in audio folder: ", len(audio_clips))
-
-# test_specs = np.empty((len(audio_clips), 1025, 64))
-test_specs_list = []
-test_labels = np.empty(len(audio_clips), dtype=int)
-spec_length = 0
-
-number = 0
-
-for fileName in audio_clips:
-    test_labels[number] = ord(fileName[0]) - 49
-    x, sr = librosa.load(audio_fpath+fileName, sr=44100, mono=True)
-
-    X = librosa.stft(x)
-    Xdb = librosa.amplitude_to_db(abs(X))
-
-    spec_length = max(spec_length, Xdb.shape[1])
-
-    test_specs_list.append(Xdb)
-    number += 1
-
-spec_length = 190
-for i in range(len(test_specs_list)):
-    pad_length_before = int((spec_length - test_specs_list[i].shape[1]) / 2)
-    pad_length_after = spec_length - test_specs_list[i].shape[1] - pad_length_before
-    test_specs_list[i] = np.pad(test_specs_list[i], ((0,0),(pad_length_before, pad_length_after)), 'constant')
-
-test_specs = np.array(test_specs_list)
-
-
-plt.figure(figsize=(20,5))
-
-#_______________________________________________________________________
-
-
 current_path = os.path.dirname(__file__) # Where your .py file is located
 image_path = os.path.join(current_path, 'images') # The image folder path
 font_path = os.path.join(current_path, 'fonts') # The image folder path
@@ -86,10 +42,10 @@ init()
 
 screen = display.set_mode((600,600))
 
-""" Load TensorFlow model """
-print("Loading model...")
-model = tf.keras.models.load_model('./models/my_model')
-print("Model loaded!\n")
+""" Load TensorFlow models """
+print("Loading numbers model...")
+numbers_model = tf.keras.models.load_model('./models/numbers_model')
+print("Numbers model loaded!\n")
 
 def reset_game():
     """Puts all of the pieces back"""
@@ -636,16 +592,14 @@ bcaptured = []
 game_board = [None for i in range(64)]
 en_passent = None
 
-spec_length = 190
-
 noise, sr = librosa.load("./input/audio/noise.wav", sr=44100, mono=True)
 noise = librosa.stft(noise)
 noise = librosa.amplitude_to_db(abs(noise))
 
 record_label_number = 1
-record_index_number = 0
+record_index_number = 250
 record_label_letter = 65
-record_index_letter = 0
+record_index_letter = 250
 
 """ Image Loading """
 king1 = image.load(os.path.join(image_path, "wking.png")).convert_alpha()
@@ -864,34 +818,10 @@ while running:
                 print('Recording finished')
 
                 record_index_letter = record_index_letter + 1
-                if record_index_letter == 250:
-                    record_index_letter = 0
+                if record_index_letter == 500:
+                    record_index_letter = 250
                     record_label_letter = record_label_letter + 1
                     print('\nNext up:', record_label_letter)
-
-
-
-                """ TEMPORARY """
-                # #___________________________________________________________________________
-
-                # chosen_spec = random.randint(0, len(test_labels) - 1)
-                # print("\nTesting spec nr ", chosen_spec,"\nLabel ", audio_clips[chosen_spec][0])
-
-                # spec = test_specs[chosen_spec]
-
-                # plt.subplot(2,2,1)
-                # plt.xticks([])
-                # plt.yticks([])
-                # plt.grid(False)
-                # librosa.display.specshow(spec, sr=sr, x_axis='time', y_axis='log')
-
-                # spec = (np.expand_dims(spec,0))
-
-                # predictions_single = model.predict(spec)
-
-                # print("\nPredicted: ",np.argmax(predictions_single[0]))
-
-                # print("Actual: ", test_labels[chosen_spec])
 
                 #___________________________________________________________________________
 
@@ -919,85 +849,28 @@ while running:
             elif c == 'row':
                 # Record voice
                 seconds = 2
-                print('\nRecording label', record_label_number, 'index', record_index_number)
+                print("Start talking")
                 x = sd.rec(int(seconds * sr), samplerate=sr, channels=1)
                 sd.wait()
 
                 # Transform recording to spectrogram
                 x = np.reshape(x, x.size)
-                
-                sf.write("./input/audio/recordedNumbers/" + str(record_label_number) + " - " + str(record_index_number) + ".wav", x, sr, subtype='PCM_24')
-                print('Recording finished')
+                X = librosa.stft(x)
+                Xdb = librosa.amplitude_to_db(abs(X))
 
-                record_index_number = record_index_number + 1
-                if record_index_number == 250:
-                    record_index_number = 0
-                    record_label_number = record_label_number + 1
-                    print('\nNext up:', record_label_number)
-                
+                # Normalise spectrogram
+                Xdb = Xdb - np.amin(Xdb)
+                Xdb = Xdb / np.amax(Xdb)
 
-                """ TO USE """
-                # #_________________________________________________________________________
-                # X = librosa.stft(x)
-                # Xdb = librosa.amplitude_to_db(abs(X))
+                # Expand dimensions
+                Xdb = (np.expand_dims(Xdb,0))
 
-                # # Pad spectrogram
-                # pad_length_before = int((spec_length - Xdb.shape[1]) / 2)
-                # pad_length_after = spec_length - Xdb.shape[1] - pad_length_before
+                # Predict
+                predict_recording = numbers_model.predict(Xdb)
 
-                # start = random.randint(0,noise.shape[1]-pad_length_before)
-                # end = start + pad_length_before
-                # noise_before = noise[...,start:end]
+                print("Predicted: ",np.argmax(predict_recording[0]) + 1)
 
-                # append_before = np.append(noise_before, Xdb, axis=1)
-
-                # start = random.randint(0,noise.shape[1]-pad_length_after)
-                # end = start + pad_length_after
-                # noise_after = noise[...,start:end]
-
-                # Xdb = np.append(append_before, noise_after, axis=1)
-
-                # # Normalise spectrogram
-                # Xdb = Xdb - np.amin(Xdb)
-                # Xdb = Xdb / (np.amax(Xdb) - np.amin(Xdb))
-
-                # plt.subplot(2, 2, 2)
-                # librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='log')
-
-                # # Expand dimensions
-                # Xdb = (np.expand_dims(Xdb,0))
-
-                # # Predict
-                # predict_recording = model.predict(Xdb)
-
-                # print("nPredicted: ",np.argmax(predict_recording[0]))
-
-                # plt.colorbar()
-                # plt.show()
-
-                #______________________________________________________________________________
-
-                # button_pressed = False
-                # while not button_pressed:
-                #     for evnt in event.get():
-                #         if evnt.type == KEYDOWN:
-                #             button_pressed = True
-                #             if evnt.key == K_1:
-                #                 Position.y = 125
-                #             elif evnt.key == K_2:
-                #                 Position.y = 175
-                #             elif evnt.key == K_3:
-                #                 Position.y = 225
-                #             elif evnt.key == K_4:
-                #                 Position.y = 275
-                #             elif evnt.key == K_5:
-                #                 Position.y = 325
-                #             elif evnt.key == K_6:
-                #                 Position.y = 375
-                #             elif evnt.key == K_7:
-                #                 Position.y = 425
-                #             elif evnt.key == K_8:
-                #                 Position.y = 475
+                Position.y = 125 + 50 * np.argmax(predict_recording[0])
             else:
                 if selected == None:    # Select piece that was clicked on
                     select_piece(c)
