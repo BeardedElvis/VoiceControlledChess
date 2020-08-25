@@ -29,7 +29,6 @@ import random
 
 spec_length = 173
 
-
 def load_specs(audio_fpath, spec_length, ascii_offset):
     audio_clips = os.listdir(audio_fpath)
     print("No. of .wav files in folder: ", len(audio_clips))
@@ -76,6 +75,10 @@ def create_model(model_path, spec_length, train_specs, train_labels, test_specs,
     # Test model
     test_loss, test_acc = model.evaluate(test_specs, test_labels, verbose=2)
 
+    return model
+
+""" CREATE MODEL FOR NUMBERS """
+
 # Load training set
 print("\nLoading training data")
 train_specs, train_labels = load_specs("./input/audio/trainRecordedNumbers/", spec_length, 49)
@@ -87,8 +90,30 @@ test_specs, test_labels = load_specs("./input/audio/testRecordedNumbers/", spec_
 # Create model
 model = create_model('./models/numbers_model', spec_length, train_specs, train_labels, test_specs, test_labels, 10)
 
-# probability_model = tf.keras.Sequential([model,
-#                                         tf.keras.layers.Softmax()])
+# Use trained model
+chosen_spec = random.randint(0, len(test_labels) - 1)
+spec = test_specs[chosen_spec]
+
+spec = (np.expand_dims(spec,0))
+
+predictions_single = model.predict(spec)
+
+print("\nPredicted: ",np.argmax(predictions_single[0]) + 1)
+
+print("Actual: ", test_labels[chosen_spec] + 1)
+
+""" CREATE MODEL FOR LETTERS """
+
+# Load training set
+print("\nLoading training data")
+train_specs, train_labels = load_specs("./input/audio/trainRecordedLetters/", spec_length, 65)
+
+# Load testing set
+print("\nLoading testing data")
+test_specs, test_labels = load_specs("./input/audio/testRecordedLetters/", spec_length, 65)
+
+# Create model
+model = create_model('./models/letters_model', spec_length, train_specs, train_labels, test_specs, test_labels, 10)
 
 # Use trained model
 chosen_spec = random.randint(0, len(test_labels) - 1)
@@ -98,6 +123,6 @@ spec = (np.expand_dims(spec,0))
 
 predictions_single = model.predict(spec)
 
-print("\nPredicted: ",np.argmax(predictions_single[0]))
+print("\nPredicted: ", chr(np.argmax(predictions_single[0]) + 65))
 
-print("Actual: ", test_labels[chosen_spec])
+print("Actual: ", chr(test_labels[chosen_spec] + 65))

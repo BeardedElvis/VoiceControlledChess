@@ -24,3 +24,11 @@ data/
 *.whl
 
 *.rar
+
+source/Chess.build/
+
+source/testSavedModel.build/
+
+Game/
+
+*.zip

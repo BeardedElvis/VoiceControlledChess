@@ -49,17 +49,17 @@ def load_specs(audio_fpath, spec_length, ascii_offset):
 
 # Load testing set
 print("\nLoading testing data")
-test_specs, test_labels = load_specs("./input/audio/testRecordedNumbers/", 173, 49)
+test_specs, test_labels = load_specs("./input/audio/testRecordedLetters/", 173, 65)
 
 # Load model
 print("Loading model...")
-model = tf.keras.models.load_model('./models/numbers_model')
+model = tf.keras.models.load_model('./models/letters_model')
 print("Model loaded!\n")
 
 model.evaluate(test_specs, test_labels, verbose=2)
 
 # Use trained model
-chosen_spec = random.randint(175, len(test_labels) - 1)
+chosen_spec = random.randint(0, len(test_labels) - 1)
 print("Testing spec nr ", chosen_spec,"\nLabel ", test_labels[chosen_spec] + 1)
 
 spec = test_specs[chosen_spec]
@@ -71,3 +71,5 @@ predictions_single = model.predict(spec)
 print("\nPredicted: ",np.argmax(predictions_single[0]))
 
 print("Actual: ", test_labels[chosen_spec])
+
+wait = input("\nPress any key to continue...")

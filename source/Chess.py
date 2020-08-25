@@ -44,8 +44,12 @@ screen = display.set_mode((600,600))
 
 """ Load TensorFlow models """
 print("Loading numbers model...")
-numbers_model = tf.keras.models.load_model('./models/numbers_model')
+numbers_model = tf.keras.models.load_model('../models/numbers_model')
 print("Numbers model loaded!\n")
+
+print("Loading letters model...")
+letters_model = tf.keras.models.load_model('../models/letters_model')
+print("Letters model loaded!\n")
 
 def reset_game():
     """Puts all of the pieces back"""
@@ -592,14 +596,7 @@ bcaptured = []
 game_board = [None for i in range(64)]
 en_passent = None
 
-noise, sr = librosa.load("./input/audio/noise.wav", sr=44100, mono=True)
-noise = librosa.stft(noise)
-noise = librosa.amplitude_to_db(abs(noise))
-
-record_label_number = 1
-record_index_number = 250
-record_label_letter = 65
-record_index_letter = 250
+sr = 44100
 
 """ Image Loading """
 king1 = image.load(os.path.join(image_path, "wking.png")).convert_alpha()
@@ -807,45 +804,28 @@ while running:
             elif c == 'column':
                 # Record voice
                 seconds = 2
-                print('\nRecording label', chr(record_label_letter), 'index', record_index_letter)
+                print("Start talking")
                 x = sd.rec(int(seconds * sr), samplerate=sr, channels=1)
                 sd.wait()
 
                 # Transform recording to spectrogram
                 x = np.reshape(x, x.size)
-                
-                sf.write("./input/audio/recordedLetters/" + chr(record_label_letter) + " - " + str(record_index_letter) + ".wav", x, sr, subtype='PCM_24')
-                print('Recording finished')
+                X = librosa.stft(x)
+                Xdb = librosa.amplitude_to_db(abs(X))
 
-                record_index_letter = record_index_letter + 1
-                if record_index_letter == 500:
-                    record_index_letter = 250
-                    record_label_letter = record_label_letter + 1
-                    print('\nNext up:', record_label_letter)
+                # Normalise spectrogram
+                Xdb = Xdb - np.amin(Xdb)
+                Xdb = Xdb / np.amax(Xdb)
 
-                #___________________________________________________________________________
+                # Expand dimensions
+                Xdb = (np.expand_dims(Xdb,0))
 
-                # button_pressed = False
-                # while not button_pressed:
-                #     for evnt in event.get():
-                #         if evnt.type == KEYDOWN:
-                #             button_pressed = True
-                #             if evnt.key == K_a:
-                #                 Position.x = 125
-                #             elif evnt.key == K_b:
-                #                 Position.x = 175
-                #             elif evnt.key == K_c:
-                #                 Position.x = 225
-                #             elif evnt.key == K_d:
-                #                 Position.x = 275
-                #             elif evnt.key == K_e:
-                #                 Position.x = 325
-                #             elif evnt.key == K_f:
-                #                 Position.x = 375
-                #             elif evnt.key == K_g:
-                #                 Position.x = 425
-                #             elif evnt.key == K_h:
-                #                 Position.x = 475
+                # Predict
+                predict_recording = letters_model.predict(Xdb)
+
+                print("Predicted: ",chr(np.argmax(predict_recording[0]) + 65))
+
+                Position.x = 125 + 50 * np.argmax(predict_recording[0])
             elif c == 'row':
                 # Record voice
                 seconds = 2
