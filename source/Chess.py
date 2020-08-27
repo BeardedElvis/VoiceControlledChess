@@ -1,30 +1,23 @@
-import pygame
+import pygame   # Version 1.9.6
 from pygame import *
 from random import *
 
 import os
 import sys
 import platform
-# sys.path.append('modules')  # Access my module folder for importing
 
 from menu import *
 
 print("Importing librosa")
-import librosa
-print("Importing librosa.display")
-import librosa.display
-print("Importing pyplot")
-import matplotlib.pyplot as plt
+import librosa  # Version 0.8.0
 print("Importing sounddevice")
-import sounddevice as sd
+import sounddevice as sd    # Version 0.3.15
 print("Importing tensorflow")
-import tensorflow as tf
+import tensorflow as tf # Version 2.0.0
 print("Importing keras")
-from tensorflow import keras
+from tensorflow import keras    # Version 2.2.4-tf  
 print("Importing numpy")
-import numpy as np
-print("Importing soundfile")
-import soundfile as sf
+import numpy as np  # Version 1.16.0
 
 current_path = os.path.dirname(__file__) # Where your .py file is located
 image_path = os.path.join(current_path, 'images') # The image folder path
@@ -44,11 +37,11 @@ screen = display.set_mode((600,600))
 
 """ Load TensorFlow models """
 print("Loading numbers model...")
-numbers_model = tf.keras.models.load_model('../models/numbers_model')
+numbers_model = tf.keras.models.load_model('./models/numbers_model')
 print("Numbers model loaded!\n")
 
 print("Loading letters model...")
-letters_model = tf.keras.models.load_model('../models/letters_model')
+letters_model = tf.keras.models.load_model('./models/letters_model')
 print("Letters model loaded!\n")
 
 def reset_game():

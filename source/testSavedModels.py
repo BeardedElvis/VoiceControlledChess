@@ -2,23 +2,15 @@
 print("Importing os")
 import os
 print("Importing librosa")
-import librosa
-print("Importing librosa.display")
-import librosa.display
-print("Importing pyplot")
-import matplotlib.pyplot as plt
-
-# sound recording
-print("Importing sounddevice")
-import sounddevice as sd
+import librosa  # Version 0.8.0
 
 # machine learning
 print("Importing tensorflow")
-import tensorflow as tf
+import tensorflow as tf # Version 2.0.0
 print("Importing keras")
-from tensorflow import keras
+from tensorflow import keras    # Version 2.2.4-tf  
 print("Importing numpy")
-import numpy as np
+import numpy as np  # Version 1.16.0
 
 print("Importing random")
 import random
@@ -45,22 +37,28 @@ def load_specs(audio_fpath, spec_length, ascii_offset):
         # Add to array
         specs[i] = Xdb
 
+        print("Loaded " + str(i + 1) + "/" + str(len(audio_clips)) + " files", end='\r')
+
+    print('\n')
+
     return specs, labels
+
+print("\nTesting numbers model")
 
 # Load testing set
 print("\nLoading testing data")
-test_specs, test_labels = load_specs("./input/audio/testRecordedLetters/", 173, 65)
+test_specs, test_labels = load_specs("./input/audio/testRecordedNumbers/", 173, 49)
 
 # Load model
-print("Loading model...")
-model = tf.keras.models.load_model('./models/letters_model')
-print("Model loaded!\n")
+print("Loading numbers model...")
+model = tf.keras.models.load_model('./models/numbers_model')
+print("Model loaded!")
 
 model.evaluate(test_specs, test_labels, verbose=2)
 
 # Use trained model
 chosen_spec = random.randint(0, len(test_labels) - 1)
-print("Testing spec nr ", chosen_spec,"\nLabel ", test_labels[chosen_spec] + 1)
+print("\nTesting spec nr", chosen_spec)
 
 spec = test_specs[chosen_spec]
 
@@ -68,8 +66,35 @@ spec = (np.expand_dims(spec,0))
 
 predictions_single = model.predict(spec)
 
-print("\nPredicted: ",np.argmax(predictions_single[0]))
+print("\nPredicted:",np.argmax(predictions_single[0]) + 1)
 
-print("Actual: ", test_labels[chosen_spec])
+print("Actual:", test_labels[chosen_spec] + 1)
 
 wait = input("\nPress any key to continue...")
+
+print("\nTesting letters model")
+
+# Load testing set
+print("\nLoading testing data")
+test_specs, test_labels = load_specs("./input/audio/testRecordedLetters/", 173, 65)
+
+# Load model
+print("Loading letters model...")
+model = tf.keras.models.load_model('./models/letters_model')
+print("Model loaded!")
+
+model.evaluate(test_specs, test_labels, verbose=2)
+
+# Use trained model
+chosen_spec = random.randint(0, len(test_labels) - 1)
+print("\nTesting spec nr", chosen_spec)
+
+spec = test_specs[chosen_spec]
+
+spec = (np.expand_dims(spec,0))
+
+predictions_single = model.predict(spec)
+
+print("\nPredicted:",chr(np.argmax(predictions_single[0]) + 65))
+
+print("Actual:", chr(test_labels[chosen_spec] + 65))

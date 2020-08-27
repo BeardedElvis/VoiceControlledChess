@@ -32,3 +32,5 @@ source/testSavedModel.build/
 Game/
 
 *.zip
+
+chessEnv/

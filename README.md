@@ -1,13 +1,32 @@
 VoiceControlledChess
 
-python365.exe -m venv envChess
-envChess/Scripts/activate
+Setup instructions:
+
+This project was built for python 3.6.5 64-bit
+To set up, install python 3.6.5 and make sure this version will be run when running the command "python" in the command prompt.
+Then run the file SetupAndRun which will execute the following commands:
+
+python -m venv chessEnv
+call chessEnv/Scripts/activate
 python -m pip install --upgrade pip
-pip install numpy
-pip install librosa
-pip install matplotlib
-pip install IPython
+pip install pygame==1.9.6
+pip install librosa==0.8.0
+pip install sounddevice==0.3.15
 pip install --upgrade https://storage.googleapis.com/tensorflow/windows/cpu/tensorflow-2.0.0-cp36-cp36m-win_amd64.whl
-pip install seaborn
-pip install hickle
-pip install hypothesis
+pip install keras==2.2.4 --force-reinstall
+pip install numpy==1.16.0
+python "source/Chess.py"
+
+Any data used to train the models (by running the file "trainModels.py") should be placed in
+VoiceControlledChess/input/audio/trainRecordedNumbers and VoiceControlledChess/input/audio/trainRecordedLetters
+for numbers and letters respectively. The testing data should similarly be placed in
+VoiceControlledChess/input/audio/testRecordedNumbers and VoiceControlledChess/input/audio/testRecordedLetters
+
+Game instructions:
+To choose a column, click the button "Choose Column". You will then have two seconds to speak the name of a column using the
+NATO phonetic alphabet: Alpha, Bravo, Charlie, Delta, Echo, Foxtrot, Golf or Hotel
+
+To choose a row, click the button "Choose Row". You will then have two seconds to speak the name of a row:
+One, Two, Three, Four, Five, Six, Seven or Eight
+
+When the correct tile has been chosen, press enter to confirm

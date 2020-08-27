@@ -2,27 +2,15 @@
 print("Importing os")
 import os
 print("Importing librosa")
-import librosa
-print("Importing librosa.display")
-import librosa.display
-print("Importing audioread")
-import audioread
-print("Importing pyplot")
-import matplotlib.pyplot as plt
-
-# sound recording
-print("Importing sounddevice")
-import sounddevice as sd
+import librosa  # Version 0.8.0
 
 # machine learning
 print("Importing tensorflow")
-import tensorflow as tf
+import tensorflow as tf # Version 2.0.0
 print("Importing keras")
-from tensorflow import keras
-print("Importing ImageDataGenerator")
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow import keras    # Version 2.2.4-tf  
 print("Importing numpy")
-import numpy as np
+import numpy as np  # Version 1.16.0
 
 print("Importing random")
 import random
@@ -51,6 +39,9 @@ def load_specs(audio_fpath, spec_length, ascii_offset):
         # Add to array
         specs[i] = Xdb
 
+        print("Loaded " + str(i + 1) + "/" + str(len(audio_clips)) + " files", end='\r')
+
+    print('\n')
     return specs, labels
 
 def create_model(model_path, spec_length, train_specs, train_labels, test_specs, test_labels, epochs):
@@ -79,50 +70,32 @@ def create_model(model_path, spec_length, train_specs, train_labels, test_specs,
 
 """ CREATE MODEL FOR NUMBERS """
 
+print("\nCreating numbers model")
+
 # Load training set
 print("\nLoading training data")
 train_specs, train_labels = load_specs("./input/audio/trainRecordedNumbers/", spec_length, 49)
 
 # Load testing set
-print("\nLoading testing data")
+print("Loading testing data")
 test_specs, test_labels = load_specs("./input/audio/testRecordedNumbers/", spec_length, 49)
 
 # Create model
 model = create_model('./models/numbers_model', spec_length, train_specs, train_labels, test_specs, test_labels, 10)
-
-# Use trained model
-chosen_spec = random.randint(0, len(test_labels) - 1)
-spec = test_specs[chosen_spec]
-
-spec = (np.expand_dims(spec,0))
-
-predictions_single = model.predict(spec)
-
-print("\nPredicted: ",np.argmax(predictions_single[0]) + 1)
-
-print("Actual: ", test_labels[chosen_spec] + 1)
+print("Model created!")
 
 """ CREATE MODEL FOR LETTERS """
+
+print("\nCreating letters model")
 
 # Load training set
 print("\nLoading training data")
 train_specs, train_labels = load_specs("./input/audio/trainRecordedLetters/", spec_length, 65)
 
 # Load testing set
-print("\nLoading testing data")
+print("Loading testing data")
 test_specs, test_labels = load_specs("./input/audio/testRecordedLetters/", spec_length, 65)
 
 # Create model
 model = create_model('./models/letters_model', spec_length, train_specs, train_labels, test_specs, test_labels, 10)
-
-# Use trained model
-chosen_spec = random.randint(0, len(test_labels) - 1)
-spec = test_specs[chosen_spec]
-
-spec = (np.expand_dims(spec,0))
-
-predictions_single = model.predict(spec)
-
-print("\nPredicted: ", chr(np.argmax(predictions_single[0]) + 65))
-
-print("Actual: ", chr(test_labels[chosen_spec] + 65))
+print("Model created!")
