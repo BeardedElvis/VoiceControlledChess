@@ -23,10 +23,10 @@ for numbers and letters respectively. The testing data should similarly be place
 VoiceControlledChess/input/audio/testRecordedNumbers and VoiceControlledChess/input/audio/testRecordedLetters
 
 Game instructions:
-To choose a column, click the button "Choose Column". You will then have two seconds to speak the name of a column using the
-NATO phonetic alphabet: Alpha, Bravo, Charlie, Delta, Echo, Foxtrot, Golf or Hotel
+To choose a file, click the button "Choose file". You will then have two seconds to speak the name of a file using the
+NATO phonetic alphabet: Alfa, Bravo, Charlie, Delta, Echo, Foxtrot, Golf or Hotel
 
-To choose a row, click the button "Choose Row". You will then have two seconds to speak the name of a row:
+To choose a rank, click the button "Choose rank". You will then have two seconds to speak the name of a rank:
 One, Two, Three, Four, Five, Six, Seven or Eight
 
 When the correct tile has been chosen, press enter to confirm

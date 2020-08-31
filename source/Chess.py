@@ -661,13 +661,13 @@ quit_button = Button((548,2,50,20),'quit',(0,))
 quit_button.add_layer(new_bg,(0,0),(2,))
 quit_button.add_text("Quit",font1,(0,0,0),(25,10),1,0,(0,))
 
-column_button = Button((150,550,120,20),'column',(0,))
-column_button.add_layer(new_bg3,(0,0),(2,))
-column_button.add_text("Choose column",font1,(0,0,0),(60,10),1,0,(0,))
+file_button = Button((150,550,120,20),'file',(0,))
+file_button.add_layer(new_bg3,(0,0),(2,))
+file_button.add_text("Choose file",font1,(0,0,0),(60,10),1,0,(0,))
 
-row_button = Button((350,550,120,20),'row',(0,))
-row_button.add_layer(new_bg3,(0,0),(2,))
-row_button.add_text("Choose row",font1,(0,0,0),(60,10),1,0,(0,))
+rank_button = Button((350,550,120,20),'rank',(0,))
+rank_button.add_layer(new_bg3,(0,0),(2,))
+rank_button.add_text("Choose rank",font1,(0,0,0),(60,10),1,0,(0,))
 
 add_layer_multi(layer_hovered,(0,0),(2,-5),board_buttons)
 add_layer_multi(layer_selected,(0,0),(5,),board_buttons)
@@ -675,7 +675,7 @@ add_layer_multi(layer_is_move,(0,0),(-2,-5,6,-7),board_buttons)
 add_layer_multi(layer_is_capture,(0,0),(-2,-5,7),board_buttons)
 
 add_objects(game_menu,board_buttons)
-add_objects(game_menu,(new_game,quit_button, column_button, row_button))
+add_objects(game_menu,(new_game,quit_button, file_button, rank_button))
 
 # Win menu
 win_menu = make_menu((175,270,250,90),'win',1)
@@ -742,7 +742,7 @@ class Position:
     y = 125
     e = 0
     col = 0
-    row = 0
+    rank = 0
 
 running = 1
 while running:
@@ -794,7 +794,7 @@ while running:
                 reset_game()
             elif c == 'quit':   # Exit game button
                 running = 0
-            elif c == 'column':
+            elif c == 'file':
                 # Record voice
                 seconds = 2
                 print("Start talking")
@@ -819,7 +819,7 @@ while running:
                 print("Predicted: ",chr(np.argmax(predict_recording[0]) + 65))
 
                 Position.x = 125 + 50 * np.argmax(predict_recording[0])
-            elif c == 'row':
+            elif c == 'rank':
                 # Record voice
                 seconds = 2
                 print("Start talking")
